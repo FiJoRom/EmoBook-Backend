@@ -28,6 +28,21 @@ jobs:
           docker-compose up -d
           docker ps
 
+      # Warte, bis die App erreichbar ist
+      - name: Wait for app to be ready
+        run: |
+          for i in {1..30}; do
+            if curl --silent --fail http://localhost:8000/ >/dev/null; then
+              echo "App ist erreichbar!"
+              exit 0
+            fi
+            echo "Warte auf App... ($i/30)"
+            sleep 3
+          done
+          echo "App hat sich nicht gestartet!"
+          docker-compose logs
+          exit 1
+
       # ngrok installieren
       - name: Install ngrok
         run: |
